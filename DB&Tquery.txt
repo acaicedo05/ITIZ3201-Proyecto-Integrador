@@ -1,0 +1,71 @@
+-- Create the database if it doesn't exist
+CREATE DATABASE IF NOT EXISTS FarmaciasCCM;
+USE FarmaciasCCM;
+
+-- Creación de la tabla "Sucursal"
+CREATE TABLE Sucursal (
+  ID_Sucursal INT PRIMARY KEY,
+  Nombre VARCHAR(100),
+  Direccion VARCHAR(200),
+  Ciudad VARCHAR(100),
+  Telefono VARCHAR(50)
+);
+
+-- Creación de la tabla "Empleado"
+CREATE TABLE Empleado (
+  ID_Empleado INT PRIMARY KEY,
+  Nombre VARCHAR(100),
+  Apellido VARCHAR(100),
+  Direccion VARCHAR(200),
+  Telefono VARCHAR(50),
+  ID_Sucursal INT,
+  FOREIGN KEY (ID_Sucursal) REFERENCES Sucursal(ID_Sucursal)
+);
+
+-- Creación de la tabla "Producto"
+CREATE TABLE Producto (
+  ID_Producto INT PRIMARY KEY,
+  Nombre VARCHAR(100),
+  Descripcion VARCHAR(200),
+  Precio DECIMAL(10, 2)
+);
+
+-- Creación de la tabla "Inventario"
+CREATE TABLE Inventario (
+  ID_Inventario INT PRIMARY KEY,
+  ID_Sucursal INT,
+  ID_Producto INT,
+  Cantidad INT,
+  FOREIGN KEY (ID_Sucursal) REFERENCES Sucursal(ID_Sucursal),
+  FOREIGN KEY (ID_Producto) REFERENCES Producto(ID_Producto)
+);
+
+-- Creación de la tabla "Venta"
+CREATE TABLE Venta (
+  ID_Venta INT PRIMARY KEY,
+  ID_Sucursal INT,
+  ID_Empleado INT,
+  Fecha DATE,
+  Total DECIMAL(10, 2),
+  FOREIGN KEY (ID_Sucursal) REFERENCES Sucursal(ID_Sucursal),
+  FOREIGN KEY (ID_Empleado) REFERENCES Empleado(ID_Empleado)
+);
+
+-- Create the roles only if they don't exist
+CREATE ROLE IF NOT EXISTS 'usuario_leer';
+CREATE ROLE IF NOT EXISTS 'usuario_editar';
+
+-- Create the users only if they don't exist
+CREATE USER IF NOT EXISTS 'UsuarioLeer'@'localhost' IDENTIFIED BY '1234';
+CREATE USER IF NOT EXISTS 'UsuarioEditar'@'localhost' IDENTIFIED BY '1234';
+
+-- Grant privileges to the roles
+GRANT SELECT ON ProyectoCCM.* TO 'usuario_leer';
+GRANT INSERT, UPDATE, DELETE ON ProyectoCCM.* TO 'usuario_editar';
+
+-- Grant roles to the users
+GRANT usuario_leer TO 'UsuarioLeer'@'localhost';
+GRANT usuario_editar TO 'UsuarioEditar'@'localhost';
+
+-- Flush privileges to apply the changes
+FLUSH PRIVILEGES;
